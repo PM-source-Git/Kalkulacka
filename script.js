@@ -1,10 +1,18 @@
 const historyEl = document.getElementById('history');
 const currentEl = document.getElementById('current');
+const modeBtn = document.getElementById('modeBtn');
 
 let current = '0';
 let previous = null;
 let operator = null;
 let justEvaluated = false;
+let angleMode = 'DEG';
+
+const TRIG_FNS = {
+  sin: Math.sin,
+  cos: Math.cos,
+  tan: Math.tan,
+};
 
 const OPERATORS = {
   '+': (a, b) => a + b,
@@ -65,6 +73,18 @@ function applyPercent() {
   current = formatNumber(value);
 }
 
+function toggleAngleMode() {
+  angleMode = angleMode === 'DEG' ? 'RAD' : 'DEG';
+  modeBtn.textContent = angleMode;
+}
+
+function applyTrig(fn) {
+  const value = parseFloat(current.replace(',', '.'));
+  const angle = angleMode === 'DEG' ? (value * Math.PI) / 180 : value;
+  current = formatNumber(TRIG_FNS[fn](angle));
+  justEvaluated = true;
+}
+
 function setOperator(nextOperator) {
   const value = parseFloat(current.replace(',', '.'));
   if (previous !== null && operator && !justEvaluated) {
@@ -112,6 +132,12 @@ document.querySelector('.buttons').addEventListener('click', (event) => {
       break;
     case 'percent':
       applyPercent();
+      break;
+    case 'mode':
+      toggleAngleMode();
+      break;
+    case 'trig':
+      applyTrig(value);
       break;
     case 'operator':
       setOperator(value);
